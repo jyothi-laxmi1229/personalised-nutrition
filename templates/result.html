@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Result</title>
+  <style>
+    body {
+      background-image: url("{{ url_for('static', filename='images/sports_things2.png') }}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    .container {
+      text-align: center;
+      padding: 50px;
+      background-color: rgba(255, 255, 255, 0.85);
+      margin: 3rem auto;
+      max-width: 900px;
+      border-radius: 10px;
+    }
+
+    .result-box {
+      background-color: #f8f8f8;
+      padding: 1rem;
+      border-radius: 10px;
+      display: inline-block;
+      font-size: 1.1rem;
+      white-space: pre-wrap;
+      text-align: left;
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 80%;
+      margin: 2rem auto;
+      border-collapse: collapse;
+      font-size: 1rem;
+    }
+
+    table, th, td {
+      border: 1px solid #aaa;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+
+    img {
+      max-width: 90%;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+    }
+
+    .back-btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Calorie Calculation Result</h2>
+
+    <div class="result-box">{{ result }}</div>
+
+    {% if recommended_split and consumed_split %}
+      <h3>Meal-wise Calorie Intake Comparison</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Meal</th>
+            <th>Recommended (kcal)</th>
+            <th>Consumed (kcal)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for meal in ['Breakfast', 'Lunch', 'Dinner', 'Snacks'] %}
+            {% if recommended_split[meal] > 0 or consumed_split[meal] > 0 %}
+            <tr>
+              <td>{{ meal }}</td>
+              <td>{{ recommended_split[meal]|round(2) }}</td>
+              <td>{{ consumed_split[meal]|default(0)|round(2) }}</td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    {% if graph_path %}
+      <img src="{{ graph_path }}" alt="Weekly Graph">
+    {% else %}
+      <p>No graph available yet. Add meals to start tracking!</p>
+    {% endif %}
+
+
+
+    <br>
+    <a href="/"><button class="back-btn">Back to Home</button></a>
+    <br>
+    <form action="/generate-report" method="get">
+    <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px;">
+        Generate Weekly Report
+    </button>
+    </form>
+
+  </div>
+</body>
+</html>

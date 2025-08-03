@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calorie Report for {{ username }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        h1 {
+            color: #333;
+        }
+        .section {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .macro-values {
+            font-size: 18px;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        img {
+            width: 400px;
+            margin-top: 10px;
+        }
+        .back-btn {
+            margin-top: 20px;
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .flex-container .section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 48%;
+        }
+        .pie img {
+            display: block;
+            margin: 0 auto;
+        }
+        .analysis {
+            background: #ffffff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 6px solid #28a745; /* green accent */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .analysis:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        .analysis h2 {
+            color: #2c3e50;
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+        .analysis p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+    <h1>Weekly Macronutrient Report: {{ username }}</h1>
+
+    <div class="flex-container">
+        <div class="analysis pie section">
+            <h2>Macronutrient Breakdown</h2>
+            {% if pie_chart %}
+                <img src="{{ url_for('static', filename=pie_chart) }}" alt="Macronutrient Pie Chart">
+            {% else %}
+                <p>No pie chart available for this user.</p>
+            {% endif %}
+        </div>
+
+        <div class="analysis section">
+           <h2>Weekly Nutrition Analysis</h2>
+           <p>{{ insights | safe }}</p>
+        </div>
+    </div>
+
+<a href="/" class="back-btn">Back to Home</a>
+
+
+</body>
+</html>

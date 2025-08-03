@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Start Tracking</title>
+</head>
+<body style="text-align:center; padding: 50px;">
+  <h2>Enter Your Details</h2>
+  <form onsubmit="event.preventDefault(); validateCredentials();">
+    <label>Username:</label>
+    <input type="text" name="username" required><br><br>
+    <label>Age:</label>
+    <input type="number" name="age" required><br><br>
+    <button type="submit">Start Tracking</button>
+    <div id="errorMessage" style="color:red; margin-top:10px; display:none;"></div>
+  </form>
+<script>
+    function validateCredentials() {
+      const username = document.forms[0].username.value;
+      const age = parseInt(document.forms[0].age.value);
+      
+      // Load dataset from external source
+      fetch('/static/meal_logs.csv')
+        .then(response => response.text())
+        .then(csvData => {
+          const rows = csvData.split('\n');
+          const headers = rows[0].split(',');
+          const usernameIndex = headers.indexOf('username');
+          const ageIndex = headers.indexOf('age');
+          
+          for (let i = 1; i < rows.length; i++) {
+            const rowData = rows[i].split(',');
+           if (rowData[usernameIndex]?.trim().toLowerCase() === username.toLowerCase() && parseInt(rowData[ageIndex]?.trim()) === age)
+            {
+              alert("Credentials valid! Submitting form...");
+              return true;
+            }
+          }
+          
+          document.getElementById('errorMessage').textContent = 
+            "Invalid username or age. Please provide correct data.";
+          document.getElementById('errorMessage').style.display = 'block';
+          return false;
+        })
+        .catch(error => {
+          console.error('Error loading CSV:', error);
+          document.getElementById('errorMessage').textContent = 
+            "Error validating credentials. Please try again later.";
+          document.getElementById('errorMessage').style.display = 'block';
+          return false;
+        });
+      
+      // Prevent form submission until validation completes
+      return false;
+    }
+  </script>
+</body>
+</html>

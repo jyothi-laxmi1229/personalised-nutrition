@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calorie Intake Calculator</title>
+  <style>
+    /* Default Design Guidelines - Minimal Elegant */
+    :root {
+      --bg-color: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --button-bg: #000000;
+      --button-hover-bg: #333333;
+      --border-radius: 0.75rem;
+      --font-heading: 'Arial Black', Arial, sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --input-border: #d1d5db;
+      --input-focus-border: #2563eb;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-image: url("{{ url_for('static', filename='images/sports_things2.png') }}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    main.card {
+      max-width: 600px;
+      width: 100%;
+      background: var(--bg-color);
+      padding: 3rem 2.5rem 3rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    h1 {
+      margin: 0;
+      color: var(--text-primary);
+      font-family: var(--font-heading);
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.1;
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    label {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-primary);
+      user-select: none;
+    }
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.85rem 1.25rem;
+      font-size: 1.125rem;
+      font-family: var(--font-body);
+      border: 1.5px solid var(--input-border);
+      border-radius: 0.5rem;
+      color: var(--text-primary);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder {
+      color: var(--text-secondary);
+      opacity: 1;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--input-focus-border);
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.35);
+      background-color: #f0f8ff;
+    }
+    button {
+      padding: 1rem 0;
+      border: none;
+      border-radius: 0.75rem;
+      background-color: var(--button-bg);
+      color: white;
+      font-weight: 700;
+      font-size: 1.25rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    button:hover,
+    button:focus {
+      background-color: var(--button-hover-bg);
+      outline: none;
+    }
+    #result {
+      background-color: #fafafa;
+      padding: 1.5rem 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.05);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1.125rem;
+      white-space: pre-line;
+      text-align: center;
+      user-select: text;
+      line-height: 1.4;
+    }
+    @media (max-width: 460px) {
+      main.card {
+        padding: 2rem 1.5rem 2.5rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+      }
+      button {
+        font-size: 1.125rem;
+      }
+      #result {
+        font-size: 1rem;
+      }
+    }
+ 
+    /* NEW CSS for dynamic food inputs */
+    .food-item-group {
+        display: flex;
+        gap: 0.5rem; /* Space between food name and quantity */
+        align-items: flex-end; /* Align labels/inputs at the bottom */
+        margin-bottom: 0.75rem; /* Space between each food item group */
+        flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    }
+    .food-item-group .input-wrapper {
+        flex: 1; /* Allows inputs to grow */
+        min-width: 120px; /* Minimum width for inputs before wrapping */
+    }
+    .food-item-group label {
+        display: block; /* Make labels take full width above input */
+        margin-bottom: 0.25rem;
+    }
+    .food-item-group input {
+        margin-top: 0; /* Remove default margin */
+    }
+    .remove-food-btn {
+        background-color: #dc3545; /* Red color for remove button */
+        color: white;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: background-color 0.3s ease;
+        height: 48px; /* Match height of other inputs for alignment */
+        line-height: 1; /* Center text vertically */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0; /* Prevent button from shrinking */
+    }
+    .remove-food-btn:hover {
+        background-color: #c82333;
+    }
+    #addFoodBtn {
+        background-color: #28a745; /* Green color for add button */
+        margin-top: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+    #addFoodBtn:hover {
+        background-color: #218838;
+    }
+    .suggestions-list {
+        border: 1px solid #ccc;
+        background-color: white;
+        position: absolute;
+        z-index: 1000;
+        max-height: 150px;
+        overflow-y: auto;
+        width: 200px;
+    }
+    .suggestions-list li {
+        padding: 5px;
+    }
+    .suggestions-list li:hover {
+        background-color: #f0f0f0;
+    } 
+
+
+ </style>
+</head>
+<body>
+  <main class="card" role="main" aria-label="Calorie Intake Calculator">
+    <h1>Calorie Intake Calculator</h1>
+    <form method="POST" action="/predict" novalidate>
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" required autocomplete="username" placeholder="Enter your username" />
+
+      <label for="age">Age (years)</label>
+      <input id="age" name="age" type="number" min="1" max="120" required placeholder="e.g., 30" />
+
+      <label for="gender">Gender:</label>
+      <select name="gender">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
+      <label for="weight">Weight (kg)</label>
+      <input id="weight" name="weight" type="number" min="1" max="500" step="0.1" required placeholder="e.g., 70.5" />
+
+      <label for="height">Height (cm)</label>
+      <input id="height" name="height" type="number" min="30" max="250" step="0.1" required placeholder="e.g., 175" />
+
+      <h3>Food Consumed</h3>
+      <div id="food-items-container">
+        <div class="food-item-group">
+            <div class="input-wrapper">
+                <label>Food Name</label>
+                <input type="text" name="food_name" class="food-name" autocomplete="off" placeholder="e.g., apple" required />
+                <div class="suggestions" style="border: 1px solid #ccc; background: white; position: absolute; width: 100%; z-index: 999;"></div>
+
+            </div>
+            <div class="input-wrapper">
+                <label>Quantity (g)</label>
+                <input type="number" name="food_quantity" min="1" step="0.1" placeholder="e.g., 150" required />
+            </div>
+        </div>
+      </div>
+      <button type="button" id="addFoodBtn">Add Another Food Item</button>
+      <label for="meal_type">Select Meal Type:</label>
+      <select name="meal_type" required>
+        <option value="">--Select--</option>
+        <option value="breakfast">Breakfast</option>
+        <option value="lunch">Lunch</option>
+        <option value="dinner">Dinner</option>
+        <option value="snacks">Snacks</option>
+      </select>
+
+
+    
+      <button type="submit">Calculate Calories</button>
+  
+    </form>
+
+    
+  </main>
+
+<script>
+function attachAutocomplete(foodInput, suggestionsBox) {
+    foodInput.addEventListener('input', async function () {
+        const query = this.value.trim();
+        if (query.length === 0) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        try {
+            const res = await fetch(`/autocomplete?q=${query}`);
+            const suggestions = await res.json();
+
+            suggestionsBox.innerHTML = '';
+            if (suggestions.length > 0) {
+                suggestions.forEach(item => {
+                    const div = document.createElement('div');
+                    div.textContent = item;
+                    div.style.padding = '5px';
+                    div.style.cursor = 'pointer';
+                    div.addEventListener('click', () => {
+                        foodInput.value = item;
+                        suggestionsBox.style.display = 'none';
+                    });
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        } catch (err) {
+            console.error("Suggestion fetch failed:", err);
+        }
+    });
+
+    foodInput.addEventListener('blur', function () {
+        setTimeout(() => {
+            suggestionsBox.style.display = 'none';
+        }, 200);
+    });
+}
+document.addEventListener('DOMContentLoaded', function () {
+    const addFoodBtn = document.getElementById('addFoodBtn');
+    const foodItemsContainer = document.getElementById('food-items-container');
+
+    // ✅ Attach autocomplete to initial static input
+    const initialFoodInput = document.querySelector('.food-name');
+    const initialSuggestionsBox = initialFoodInput.nextElementSibling;
+    attachAutocomplete(initialFoodInput, initialSuggestionsBox);
+
+    function createFoodItemGroup() {
+        const newFoodGroup = document.createElement('div');
+        newFoodGroup.classList.add('food-item-group');
+
+        newFoodGroup.innerHTML = `
+            <div class="input-wrapper" style="position: relative;">
+                <label>Food Name</label>
+                <input type="text" name="food_name" class="food-name" placeholder="e.g., banana" autocomplete="off" required />
+                <div class="suggestions" style="border: 1px solid #ccc; background: white; position: absolute; width: 100%; z-index: 999;"></div>
+            </div>
+            <div class="input-wrapper">
+                <label>Quantity (g)</label>
+                <input type="number" name="food_quantity" min="1" step="0.1" placeholder="e.g., 100" required />
+            </div>
+            <button type="button" class="remove-food-btn">X</button>
+        `;
+
+        foodItemsContainer.appendChild(newFoodGroup);
+
+        // ✅ Attach autocomplete to this dynamic field
+        const foodInput = newFoodGroup.querySelector('.food-name');
+        const suggestionsBox = newFoodGroup.querySelector('.suggestions');
+        attachAutocomplete(foodInput, suggestionsBox);
+
+        newFoodGroup.querySelector('.remove-food-btn').addEventListener('click', () => {
+            foodItemsContainer.removeChild(newFoodGroup);
+        });
+    }
+
+    addFoodBtn.addEventListener('click', createFoodItemGroup);
+});
+
+</script>
+
+
+
+</body>
+</html>
